@@ -64,4 +64,30 @@ public:
     void OP_Fx33(); // LD - Store BCD representation of Vx in I, I+1, I+2
     void OP_Fx55(); // LD - Store registers V0 through Vx in memory at I
     void OP_Fx65(); // LD - Read registers V0 through Vx from memory at I
+
+    void OP_NULL(); // Null guard
+
+    // type alias for function pointer that takes no arguments and returns void
+    typedef void (Chip8::*Chip8Func)();
+
+    // indexed  by last nibble (one), 0-F
+    Chip8Func table[0x10];
+    Chip8Func table0[0x10]; // 0xE + 1
+    Chip8Func table8[0x10]; // 0xE + 1
+    Chip8Func tableE[0x10]; // 0xE + 1
+
+    // indexed by last byte (two), highest 0x65
+    Chip8Func tableF[0x100]; // 0x65 + 1
+
+    // declare
+    void Table();
+    void Table0();
+    void Table8();
+    void TableF();
+    void TableE();
+
+    // Fetch
+    void Cycle();
 };
+
+
