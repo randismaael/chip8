@@ -160,6 +160,7 @@ public:
                 break;
                 }
             }
+            break;
             case SDL_KEYUP:
             {
                 switch (event.key.keysym.sym)
@@ -273,4 +274,3 @@ private:
     SDL_Renderer *renderer{};
     SDL_Texture *texture{};
 };
-

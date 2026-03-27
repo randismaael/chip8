@@ -5,6 +5,9 @@
 
 #pragma once
 
+const unsigned int VIDEO_WIDTH = 64;
+const unsigned int VIDEO_HEIGHT = 32;
+
 /**
  * CHIP-8 Emulator Class
  * Emulates the CHIP-8 virtual machine including memory, registers, stack,
@@ -37,11 +40,6 @@ public:
 
     Chip8(); // declare constructor
     void LoadROM(char const *filename);
-
-    Chip8() : randGen(std::chrono::system_clock::now().time_since_epoch().count())
-    {
-        randByte = std::uniform_int_distribution<uint8_t>(0, 255U);
-    }
 
     std::default_random_engine randGen;
     std::uniform_int_distribution<uint8_t> randByte; // rand number between 0 and 255
@@ -97,7 +95,6 @@ public:
     Chip8Func tableF[0x100]; // 0x65 + 1
 
     // declare
-    void Table();
     void Table0();
     void Table8();
     void TableF();

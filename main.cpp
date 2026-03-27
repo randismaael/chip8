@@ -6,8 +6,6 @@
 #include "chip8.hpp"
 #include "platform.hpp"
 
-#include "chip8.cpp"
-
 int main(int argc, char **argv)
 {
     // error msg
@@ -51,5 +49,5 @@ int main(int argc, char **argv)
             platform.Update(chip8.video, videoPitch);
         }
     }
-    return;
+    return 0;
 }

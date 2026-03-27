@@ -1,12 +1,11 @@
 // read or write from file
 #include <fstream>
 #include "chip8.hpp"
+#include <iostream>
 
 const unsigned int START_ADDR = 0x200;
 const unsigned int FONTSET_START_ADDR = 0x50;
 const unsigned int FONTSET_SIZE = 80;
-const unsigned int VIDEO_WIDTH = 64;
-const unsigned int VIDEO_HEIGHT = 32;
 
 // Chip8 Standard Font Set
 uint8_t fontset[FONTSET_SIZE] =
@@ -29,7 +28,7 @@ uint8_t fontset[FONTSET_SIZE] =
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-Chip8::Chip8()
+Chip8::Chip8() : randGen(std::chrono::system_clock::now().time_since_epoch().count())
 {
     // Init PC
     pc = START_ADDR;
@@ -40,12 +39,16 @@ Chip8::Chip8()
         mem[FONTSET_START_ADDR + i] = fontset[i];
     }
 
+    // Random byte
+    randByte = std::uniform_int_distribution<uint8_t>(0, 255U);
+
     // locate opcode addresses, fill table in
     table[0x0] = &Chip8::Table0;
     table[0x1] = &Chip8::OP_1nnn;
     table[0x2] = &Chip8::OP_2nnn;
     table[0x3] = &Chip8::OP_3xkk;
-    table[0x4] = &Chip8::OP_5xy0;
+    table[0x4] = &Chip8::OP_4xkk;
+    table[0x5] = &Chip8::OP_5xy0;
     table[0x6] = &Chip8::OP_6xkk;
     table[0x7] = &Chip8::OP_7xkk;
     table[0x8] = &Chip8::Table8;
@@ -103,7 +106,8 @@ Chip8::Chip8()
  */
 void Chip8::Table0()
 {
-    ((*this).*(table0[opcode & 0x000Fu]))();
+    uint8_t idx = opcode & 0x000Fu;
+    ((*this).*(table0[idx]))();
 }
 
 /**
@@ -130,7 +134,7 @@ void Chip8::TableE()
  */
 void Chip8::TableF()
 {
-    ((*this).*(table0[opcode & 0x00FFu]))();
+    ((*this).*(tableF[opcode & 0x00FFu]))();
 }
 
 /**
@@ -170,7 +174,9 @@ void Chip8::LoadROM(char const *filename)
  */
 void Chip8::OP_NULL()
 {
+    // do nothing - invalid opcode
 }
+
 /**
  * Clear the display
  */
@@ -263,7 +269,7 @@ void Chip8::OP_5xy0()
 void Chip8::OP_6xkk()
 {
     uint8_t Vx = (opcode >> 8u) & 0x0Fu;
-    uint8_t byte = 0xFFu;
+    uint8_t byte = opcode & 0xFFu;
 
     registers[Vx] = byte;
 }
@@ -665,9 +671,9 @@ void Chip8::Cycle()
 {
     // Fetch
     // Opcodes are 2 bytes but memory is 1 byte per address, so combine two consecutive bytes
-    opcode = (mem[pc] << 8u) | mem[pc + 1];
-
+    opcode = ((uint16_t)mem[pc] << 8u) | (uint16_t)mem[pc + 1];
     pc += 2;
+
     // Use first nibble as index into function pointer table, decode and execute
     ((*this).*(table[(opcode >> 12u) & 0xF]))();
 
