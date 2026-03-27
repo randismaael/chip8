@@ -1,7 +1,6 @@
 #include <cstdint>
 #include <chrono>
 #include <random>
-#include <stdio.h>
 
 #pragma once
 

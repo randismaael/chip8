@@ -309,7 +309,7 @@ void Chip8::OP_8xy1()
     uint8_t Vx = (opcode >> 8u) & 0x0Fu;
     uint8_t Vy = (opcode >> 4u) & 0x0Fu;
 
-    registers[Vx] = registers[Vx] || registers[Vy];
+    registers[Vx] = (registers[Vx] | registers[Vy]);
 }
 
 /**
@@ -368,7 +368,7 @@ void Chip8::OP_8xy5()
     uint8_t Vx = (opcode >> 8u) & 0x0Fu;
     uint8_t Vy = (opcode >> 4u) & 0x0Fu;
 
-    registers[0xF] = (Vx > Vy) ? 1 : 0;
+    registers[0xF] = (registers[Vx] > registers[Vy]) ? 1 : 0;
 
     registers[Vx] -= registers[Vy];
 }
@@ -384,7 +384,7 @@ void Chip8::OP_8xy6()
 
     // LSB can only be 0 or 1
     registers[0xF] = registers[Vx] & 0x1u;
-    registers[Vx] >>= 2;
+    registers[Vx] >>= 1;
 }
 
 /**
@@ -397,7 +397,7 @@ void Chip8::OP_8xy7()
     uint8_t Vx = (opcode >> 8u) & 0x0Fu;
     uint8_t Vy = (opcode >> 4u) & 0x0Fu;
 
-    registers[0xF] = (Vy > Vx) ? 1 : 0;
+    registers[0xF] = (registers[Vy] > registers[Vx]) ? 1 : 0;
 
     registers[Vx] = registers[Vy] - registers[Vx];
 }
@@ -412,7 +412,7 @@ void Chip8::OP_8xyE()
     uint8_t Vx = (opcode >> 8u) & 0x0Fu;
 
     registers[0xF] = (registers[Vx] >> 7u) & 0x1u;
-    registers[Vx] <<= 2;
+    registers[Vx] <<= 1;
 }
 
 /**
@@ -631,7 +631,7 @@ void Chip8::OP_Fx33()
     value /= 10;
 
     // hundreds
-    mem[index] = value /= 10;
+    mem[index] = value % 10;
 }
 
 /**
